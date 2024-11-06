@@ -19,6 +19,8 @@ public class Dashboard extends JDialog{
     private JButton difficultyAdjustmentButton;
     private JButton parseBlockButton;
 
+    private JButton broadcastTransactionButton;
+
 
     public Dashboard(JFrame parent) {
       //  super(parent);
@@ -87,6 +89,15 @@ public class Dashboard extends JDialog{
                 GetTransaction getTx= new GetTransaction(null);
             }
         });
+
+        broadcastTransactionButton.addActionListener(new ActionListener() { // Aggiungi il listener per il nuovo pulsante
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            dispose();
+            BroadcastTransaction bt = new BroadcastTransaction(null);
+            }
+        });
+
         setTitle("Bitcoffee");
         ImageIcon icon = new ImageIcon("src/GUI/images/icons8-blockchain-2.png");
         setIconImage(icon.getImage());
