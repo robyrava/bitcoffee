@@ -1,54 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="GUI.BroadcastTransaction">
-  <grid id="27dc6" binding="BroadcastTransactionPanel" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="10" vgap="10">
+  <grid id="27dc6" binding="BroadcastTransactionPanel" layout-manager="GridLayoutManager" row-count="12" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="10" vgap="10">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="20" y="20" width="843" height="600"/>
+      <xy x="20" y="20" width="800" height="600"/>
     </constraints>
     <properties>
       <background color="-1"/>
+      <preferredSize width="800" height="600"/> <!-- Adjust the panel size -->
     </properties>
     <border type="none"/>
     <children>
-      <component id="376f" class="javax.swing.JButton" binding="exampleButton1" default-binding="true">
-        <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-          <insets top="2" left="2" bottom="2" right="2"/>
-        </constraints>
-        <properties>
-          <background color="-16737844"/>
-          <font name="Segoe UI" size="12" style="0"/>
-          <foreground color="-1"/>
-          <border type="line" color="-16737844" thickness="1" arc="15"/>
-          <text value="Example Button 1"/>
-        </properties>
-      </component>
-      <component id="46b4d" class="javax.swing.JButton" binding="exampleButton2" default-binding="true">
-        <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-          <insets top="2" left="2" bottom="2" right="2"/>
-        </constraints>
-        <properties>
-          <background color="-16737844"/>
-          <font name="Segoe UI" size="12" style="0"/>
-          <foreground color="-1"/>
-          <border type="line" color="-16737844" thickness="1" arc="15"/>
-          <text value="Example Button 2"/>
-        </properties>
-      </component>
-      <component id="8d453" class="javax.swing.JButton" binding="exampleButton3" default-binding="true">
-        <constraints>
-          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-          <insets top="2" left="2" bottom="2" right="2"/>
-        </constraints>
-        <properties>
-          <background color="-16737844"/>
-          <font name="Segoe UI" size="12" style="0"/>
-          <foreground color="-1"/>
-          <border type="line" color="-16737844" thickness="1" arc="15"/>
-          <text value="Example Button 3"/>
-        </properties>
-      </component>
       <component id="2b7c6" class="javax.swing.JButton" binding="btnBack" default-binding="true">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
@@ -77,15 +39,101 @@
           <text value=""/>
         </properties>
       </component>
-      <component id="b5165" class="javax.swing.JLabel">
+      <component id="secretTextLabel" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <enabled value="true"/>
-          <font name="Segoe UI" size="20" style="1"/>
-          <foreground color="-16737844"/>
-          <text value="A Java-based Bitcoin client created by Davide Patti (xedivad@gmail.com)"/>
+          <text value="Secret Text"/>
+        </properties>
+      </component>
+      <component id="secretTextField" class="javax.swing.JTextField" binding="secretTextField">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="prevTxIdLabel" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Previous TX ID"/>
+        </properties>
+      </component>
+      <component id="prevTxIdField" class="javax.swing.JTextField" binding="prevTxIdField">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="prevIndexLabel" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Previous Index"/>
+        </properties>
+      </component>
+      <component id="prevIndexField" class="javax.swing.JTextField" binding="prevIndexField">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="changeAddressLabel" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Change Address"/>
+        </properties>
+      </component>
+      <component id="changeAddressField" class="javax.swing.JTextField" binding="changeAddressField">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="btcChangeAmountLabel" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="BTC Change Amount"/>
+        </properties>
+      </component>
+      <component id="btcChangeAmountField" class="javax.swing.JTextField" binding="btcChangeAmountField">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="targetAddressLabel" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Target Address"/>
+        </properties>
+      </component>
+      <component id="targetAddressField" class="javax.swing.JTextField" binding="targetAddressField">
+        <constraints>
+          <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="broadcastButton" class="javax.swing.JButton" binding="broadcastButton">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <background color="-16737844"/>
+          <font name="Segoe UI" size="12" style="0"/>
+          <foreground color="-1"/>
+          <text value="Esegui Transazione"/>
         </properties>
       </component>
     </children>

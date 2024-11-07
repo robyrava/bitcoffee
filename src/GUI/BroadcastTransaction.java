@@ -1,71 +1,40 @@
 package GUI;
 
+import bitcoffee.*;
 import javax.swing.*;
-import javax.swing.border.AbstractBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class BroadcastTransaction extends JDialog {
     private JPanel BroadcastTransactionPanel;
-    private JButton exampleButton1;
-    private JButton exampleButton2;
-    private JButton exampleButton3;
-    private JButton btnBack; // Dichiarazione del nuovo pulsante
+    private JButton btnBack;
+    private JTextField secretTextField;
+    private JTextField prevTxIdField;
+    private JTextField prevIndexField;
+    private JTextField changeAddressField;
+    private JTextField btcChangeAmountField;
+    private JTextField targetAddressField; 
+    private JButton broadcastButton;
 
     public BroadcastTransaction(JFrame parent) {
         super(null, java.awt.Dialog.ModalityType.TOOLKIT_MODAL);
 
-        // Applica il bordo arrotondato ai pulsanti
-        JButton[] buttons = {
-            exampleButton1,
-            exampleButton2,
-            exampleButton3,
-            btnBack // Aggiungi il nuovo pulsante all'array
-        };
-
-        for (JButton button : buttons) {
-            if (button != null) {
-                button.setBorder(new RoundedBorder(15)); // Raggio di 15
-                button.setBackground(new Color(45, 137, 239)); // Colore blu moderno
-                button.setForeground(Color.WHITE); // Testo bianco
-                button.setFocusPainted(false);
-                button.setContentAreaFilled(true);
-                button.setOpaque(false);
-            }
-        }
-
-        // Listener per i pulsanti
-        exampleButton1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(parent,
-                        "Example Button 1 clicked!",
-                        "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        exampleButton2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(parent,
-                        "Example Button 2 clicked!",
-                        "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        exampleButton3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(parent,
-                        "Example Button 3 clicked!",
-                        "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+        //tasto home
         btnBack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Chiude la finestra corrente
-                new Dashboard(parent); // Mostra la schermata iniziale
+                dispose(); // Close the current window
+                new Dashboard(parent); // Show the initial screen
+            }
+        });
+
+        broadcastButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                broadcastTransaction();
             }
         });
 
@@ -81,22 +50,65 @@ public class BroadcastTransaction extends JDialog {
         setVisible(true);
     }
 
-    // Classe interna per il bordo arrotondato
-    private static class RoundedBorder extends AbstractBorder {
-        private int radius;
+    private void broadcastTransaction() {
+        try {
+            String secretText = secretTextField.getText();
+            String prevTxId = prevTxIdField.getText();
+            int prevIndex = Integer.parseInt(prevIndexField.getText());
+            String changeAddress = changeAddressField.getText();
+            double btcChangeAmount = Double.parseDouble(btcChangeAmountField.getText());
+            String targetAddress = targetAddressField.getText();
 
-        RoundedBorder(int radius) {
-            this.radius = radius;
-        }
+            var secretBytes = Kit.hash256(secretText);
+            var mypk = new PrivateKey(secretBytes);
 
-        @Override
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            RoundRectangle2D round = new RoundRectangle2D.Float(x, y, width - 1, height - 1, radius, radius);
-            g2.setColor(c.getForeground());
-            g2.draw(round);
-            g2.dispose();
+            var myaddress = mypk.point.getP2pkhAddress(true);
+            var wif = mypk.getWIF(true, true);
+
+            var prevTx = Kit.hexStringToByteArray(prevTxId);
+            byte[] scriptNull = {};
+            var txIn = new TxIn(prevTx, prevIndex, scriptNull);
+
+            var changeAmount = (int) (btcChangeAmount * 100000000);
+            var changeH160 = Kit.decodeBase58(changeAddress);
+            var changeScript = new P2PKHScriptPubKey(changeH160);
+            var changeOutput = new TxOut(changeAmount, changeScript.rawSerialize());
+
+            var targetBtcAmount = 0.0001;
+            var targetAmount = (int) (targetBtcAmount * 100000000);
+            var targetH160 = Kit.decodeBase58(targetAddress);
+            var targetScript = new P2PKHScriptPubKey(targetH160);
+            var targetOutput = new TxOut(targetAmount, targetScript.rawSerialize());
+
+            var txIns = new ArrayList<TxIn>();
+            var txOuts = new ArrayList<TxOut>();
+            txOuts.add(changeOutput);
+            txOuts.add(targetOutput);
+            txIns.add(txIn);
+            var txObj = new Tx(1, txIns, txOuts, 0, true);
+
+            var inputIndex = 0;
+            var z = txObj.getSigHash(inputIndex);
+            var der = mypk.signDeterminisk(z).DER();
+            var sig = Kit.hexStringToByteArray(der + "01");
+            var sec = Kit.hexStringToByteArray(mypk.point.SEC33());
+            var cmds = new Stack<ScriptCmd>();
+            cmds.push(new ScriptCmd(ScriptCmd.Type.DATA, sec));
+            cmds.push(new ScriptCmd(ScriptCmd.Type.DATA, sig));
+            var scriptsig = new Script(cmds);
+
+            var txins = txObj.getTxIns();
+            var newTxIn = new TxIn(txins.get(inputIndex).getPrevTxId(), txins.get(inputIndex).getPrevIndex(), scriptsig.rawSerialize());
+            txins.set(inputIndex, newTxIn);
+            var newTx = new Tx(txObj.getVersion(), txIns, txObj.getTxOuts(), txObj.getLocktime(), txObj.isTestnet());
+
+            JOptionPane.showMessageDialog(this,
+                    "Created tx with content:\n" + newTx + "\nFees: " + newTx.calculateFee() + "\nChecking validity: " + newTx.verify() + "\n>>>>>> PLEASE USE THIS RAW TEXT BELOW TO BROADCAST TX: \n" + newTx.getSerialString(),
+                    "Transaction Created", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error creating transaction: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
