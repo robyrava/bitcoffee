@@ -7,6 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Clipboard;
+import java.awt.Toolkit;
 
 public class BroadcastTransaction extends JDialog {
     private JPanel BroadcastTransactionPanel;
@@ -18,6 +21,9 @@ public class BroadcastTransaction extends JDialog {
     private JTextField btcChangeAmountField;
     private JTextField targetAddressField; 
     private JButton broadcastButton;
+    private JTextField targetBtcAmountField;
+    private JTextArea resultTextArea;  // Aggiungi questa dichiarazione
+    private JButton copyButton;  // Aggiungi questa dichiarazione
 
     public BroadcastTransaction(JFrame parent) {
         super(null, java.awt.Dialog.ModalityType.TOOLKIT_MODAL);
@@ -38,6 +44,17 @@ public class BroadcastTransaction extends JDialog {
             }
         });
 
+        // ActionListener per copyButton
+        copyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = resultTextArea.getText();
+                StringSelection stringSelection = new StringSelection(text);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            }
+        });
+
         setTitle("BroadcastTransaction");
         ImageIcon icon = new ImageIcon("src/GUI/images/icons8-blockchain-2.png");
         setIconImage(icon.getImage());
@@ -55,9 +72,10 @@ public class BroadcastTransaction extends JDialog {
             String secretText = secretTextField.getText();
             String prevTxId = prevTxIdField.getText();
             int prevIndex = Integer.parseInt(prevIndexField.getText());
-            String changeAddress = changeAddressField.getText();
             double btcChangeAmount = Double.parseDouble(btcChangeAmountField.getText());
+            String changeAddress = changeAddressField.getText();
             String targetAddress = targetAddressField.getText();
+            double targetBtcAmount = Double.parseDouble(targetBtcAmountField.getText()); // Nuovo input
 
             var secretBytes = Kit.hash256(secretText);
             var mypk = new PrivateKey(secretBytes);
@@ -74,7 +92,6 @@ public class BroadcastTransaction extends JDialog {
             var changeScript = new P2PKHScriptPubKey(changeH160);
             var changeOutput = new TxOut(changeAmount, changeScript.rawSerialize());
 
-            var targetBtcAmount = 0.0001;
             var targetAmount = (int) (targetBtcAmount * 100000000);
             var targetH160 = Kit.decodeBase58(targetAddress);
             var targetScript = new P2PKHScriptPubKey(targetH160);
@@ -102,13 +119,15 @@ public class BroadcastTransaction extends JDialog {
             txins.set(inputIndex, newTxIn);
             var newTx = new Tx(txObj.getVersion(), txIns, txObj.getTxOuts(), txObj.getLocktime(), txObj.isTestnet());
 
-            JOptionPane.showMessageDialog(this,
-                    "Created tx with content:\n" + newTx + "\nFees: " + newTx.calculateFee() + "\nChecking validity: " + newTx.verify() + "\n>>>>>> PLEASE USE THIS RAW TEXT BELOW TO BROADCAST TX: \n" + newTx.getSerialString(),
-                    "Transaction Created", JOptionPane.INFORMATION_MESSAGE);
+            String result = "Created tx with content:\n" + newTx +
+                            "\nFees: " + newTx.calculateFee() +
+                            "\nChecking validity: " + newTx.verify() +
+                            "\n>>>>>> PLEASE USE THIS RAW TEXT BELOW TO BROADCAST TX: \n" +
+                            newTx.getSerialString();
+            System.out.println(result);
+            resultTextArea.setText(newTx.getSerialString());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error creating transaction: " + ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            resultTextArea.setText("Error creating transaction: " + ex.getMessage());
         }
     }
 
